@@ -74,7 +74,7 @@ except ImportError:
   from sha import sha as sha1
 
 import common
-import droid_edify_generator as edify_generator
+import edify_generator as edify_generator
 
 OPTIONS = common.OPTIONS
 OPTIONS.package_key = None
@@ -300,7 +300,20 @@ def SignOutput(temp_zip_name, output_zip_name):
   common.SignFile(temp_zip_name, output_zip_name, OPTIONS.package_key, pw,
                   whole_file=True)
 
+def RetouchBinaries(self, file_list):
+    """Execute the retouch instructions in files listed."""
+    cmd = ('retouch_binaries(' +
+           ', '.join(['"' + i[0] + '", "' + i[1] + '"' for i in file_list]) +
+           ');')
+    self.script.append(self._WordWrap(cmd))
 
+  def UndoRetouchBinaries(self, file_list):
+    """Undo the retouching (retouch to zero offset)."""
+    cmd = ('undo_retouch_binaries(' +
+           ', '.join(['"' + i[0] + '", "' + i[1] + '"' for i in file_list]) +
+           ');')
+    self.script.append(self._WordWrap(cmd))
+    
 def WriteFullOTAPackage(input_zip, output_zip):
   # TODO: how to determine this?  We don't know what version it will
   # be installed on top of.  For now, we expect the API just won't
